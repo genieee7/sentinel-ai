@@ -121,7 +121,21 @@ export function PostList({ initialPosts }) {
   },
 ];
 
-function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void }) {
+function EmptyState({
+  input,
+  textareaRef,
+  onInputChange,
+  onInputKeyDown,
+  onSend,
+  onExampleClick,
+}: {
+  input: string;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onInputKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onSend: () => void;
+  onExampleClick: (text: string) => void;
+}) {
   const examples = [
     "React 컴포넌트 최적화 방법을 알려주세요",
     "TypeScript의 고급 타입 패턴을 설명해주세요",
@@ -131,21 +145,53 @@ function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4">
-      <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
-        <Sparkles className="h-7 w-7 text-primary" />
+      <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/70 bg-card shadow-sm">
+        <Sparkles className="h-8 w-8 text-primary" />
       </div>
-      <h2 className="mb-2 text-xl font-semibold text-foreground">
-        무엇을 도와드릴까요?
+      <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight text-foreground">
+        무엇을 시작해볼까요?
       </h2>
       <p className="mb-8 text-center text-sm text-muted-foreground">
-        코드 작성, 디버깅, 아키텍처 설계 등 무엇이든 물어보세요.
+        질문, 코드 생성, 리팩토링 요청까지 한 번에 입력해보세요.
       </p>
-      <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="mb-6 w-full max-w-3xl rounded-[28px] border border-border/70 bg-card/90 p-3 shadow-xl shadow-primary/5 backdrop-blur">
+        <div className="rounded-2xl border border-border/60 bg-background/80 px-3 py-2">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={onInputChange}
+            onKeyDown={onInputKeyDown}
+            placeholder="오늘 해결하고 싶은 작업을 입력하세요"
+            rows={3}
+            className="max-h-[240px] min-h-[86px] w-full resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          <div className="mt-2 flex items-center justify-between border-t border-border/60 pt-2">
+            <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <Paperclip className="h-3.5 w-3.5" />
+              파일 첨부
+            </button>
+            <button
+              onClick={onSend}
+              disabled={!input.trim()}
+              className={cn(
+                "flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-medium transition-colors",
+                input.trim()
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              시작하기
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex w-full max-w-3xl flex-wrap justify-center gap-2">
         {examples.map((example) => (
           <button
             key={example}
             onClick={() => onExampleClick(example)}
-            className="rounded-xl border border-border bg-card px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-accent"
+            className="rounded-full border border-border bg-background px-4 py-2 text-xs text-foreground transition-colors hover:bg-accent"
           >
             {example}
           </button>
@@ -341,6 +387,11 @@ export function ChatArea({
 
       {messages.length === 0 ? (
         <EmptyState
+          input={input}
+          textareaRef={textareaRef}
+          onInputChange={handleTextareaChange}
+          onInputKeyDown={handleKeyDown}
+          onSend={handleSend}
           onExampleClick={(text) => {
             setInput(text);
             textareaRef.current?.focus();
@@ -356,39 +407,41 @@ export function ChatArea({
         </ScrollArea>
       )}
 
-      <div className="shrink-0 border-t border-border px-4 pb-4 pt-3 md:px-8 lg:px-16">
-        <div className="mx-auto max-w-3xl">
-          <div className="relative flex items-end rounded-2xl border border-border bg-card shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-ring">
-            <button className="flex h-10 w-10 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
-              <Paperclip className="h-4 w-4" />
-            </button>
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={handleTextareaChange}
-              onKeyDown={handleKeyDown}
-              placeholder="메시지를 입력하세요..."
-              rows={1}
-              className="max-h-[200px] min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center transition-colors",
-                input.trim()
-                  ? "text-primary hover:text-primary/80"
-                  : "text-muted-foreground/40"
-              )}
-            >
-              <Send className="h-4 w-4" />
-            </button>
+      {messages.length > 0 && (
+        <div className="shrink-0 border-t border-border px-4 pb-4 pt-3 md:px-8 lg:px-16">
+          <div className="mx-auto max-w-3xl">
+            <div className="relative flex items-end rounded-2xl border border-border bg-card shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-ring">
+              <button className="flex h-10 w-10 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
+                <Paperclip className="h-4 w-4" />
+              </button>
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleTextareaChange}
+                onKeyDown={handleKeyDown}
+                placeholder="메시지를 입력하세요..."
+                rows={1}
+                className="max-h-[200px] min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className={cn(
+                  "flex h-10 w-10 shrink-0 items-center justify-center transition-colors",
+                  input.trim()
+                    ? "text-primary hover:text-primary/80"
+                    : "text-muted-foreground/40"
+                )}
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+              Sentinel은 실수할 수 있습니다. 중요한 정보는 직접 확인하세요.
+            </p>
           </div>
-          <p className="mt-2 text-center text-[11px] text-muted-foreground">
-            Sentinel은 실수할 수 있습니다. 중요한 정보는 직접 확인하세요.
-          </p>
         </div>
-      </div>
+      )}
     </div>
   );
 
