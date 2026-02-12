@@ -26,12 +26,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const defaultTheme = process.env.NEXT_PUBLIC_DEFAULT_THEME || "system";
+  
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme={defaultTheme}
           enableSystem
           disableTransitionOnChange
         >
