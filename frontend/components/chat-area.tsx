@@ -320,12 +320,10 @@ export function ChatArea({
     <div className="flex h-full flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          {selectedChatId ? (
+          {selectedChatId && (
             <h1 className="text-sm font-medium text-foreground">
               {sampleMessages[0]?.content.slice(0, 40)}...
             </h1>
-          ) : (
-            <h1 className="text-sm font-medium text-foreground">새 대화</h1>
           )}
         </div>
         <button
