@@ -44,6 +44,7 @@ interface ChatSidebarProps {
   onSelectChat: (id: string) => void;
   selectedChatId: string | null;
   onOpenSettings: () => void;
+  isMobile?: boolean;
 }
 
 const chatHistory: ChatHistory[] = [
@@ -74,6 +75,7 @@ export function ChatSidebar({
   onSelectChat,
   selectedChatId,
   onOpenSettings,
+  isMobile = false,
 }: ChatSidebarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -89,7 +91,10 @@ export function ChatSidebar({
       <aside
         className={cn(
           "flex h-full flex-col border-r border-border bg-sidebar transition-all duration-300 ease-in-out",
-          collapsed ? "w-16" : "w-72"
+          // 반응형 너비 설정
+          collapsed ? "w-16" : "w-72 lg:w-64 xl:w-72 2xl:w-80",
+          // 모바일에서는 절대 위치로 오버레이
+          isMobile && !collapsed && "fixed left-0 top-0 z-50 h-full shadow-2xl"
         )}
       >
         <div

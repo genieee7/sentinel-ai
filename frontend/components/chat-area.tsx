@@ -14,6 +14,9 @@ import {
   ChevronDown,
   MessageSquare,
   Zap,
+  Link,
+  Settings2,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -40,6 +43,8 @@ interface ChatAreaProps {
   selectedChatId: string | null;
   isSplitView: boolean;
   onToggleSplit: () => void;
+  onOpenSidebar?: () => void;
+  isMobile?: boolean;
 }
 
 const sampleMessages: Message[] = [
@@ -162,111 +167,112 @@ function EmptyState({
 }) {
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4">
-      <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/70 bg-card shadow-sm">
-        <Sparkles className="h-8 w-8 text-primary" />
+    <div className="flex flex-1 flex-col items-center justify-center px-3 sm:px-4 md:px-6">
+      <div className="mb-3 sm:mb-4 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border border-border/70 bg-card shadow-sm">
+        <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
       </div>
-      <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight text-foreground">
+      <h2 className="mb-1 text-center text-lg sm:text-xl font-semibold tracking-tight text-foreground">
         무엇을 시작해볼까요?
       </h2>
-      <p className="mb-8 text-center text-sm text-muted-foreground">
+      <p className="mb-4 sm:mb-6 text-center text-xs text-muted-foreground px-4">
         질문, 코드 생성, 리팩토링 요청까지 한 번에 입력해보세요.
       </p>
-      <div className="mb-6 w-full max-w-3xl rounded-[28px] border border-border/70 bg-card/90 p-3 shadow-xl shadow-primary/5 backdrop-blur">
-        <div className="rounded-2xl border border-border/60 bg-background/80 px-3 py-2">
-          <div className="flex items-start gap-2">
-            {/* 모드 선택 드롭다운 */}
-            <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-              <DropdownMenu.Trigger asChild>
-                <button className="mt-2 flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20">
-                  <currentMode.icon className="h-3.5 w-3.5" />
-                  <span>{currentMode.name}</span>
-                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                </button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                  className="z-50 min-w-[240px] rounded-xl border border-border bg-card p-1.5 shadow-xl"
-                  sideOffset={8}
-                  align="start"
-                >
-                  {modes.map((mode) => (
-                    <DropdownMenu.Item
-                      key={mode.id}
-                      className="group flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors hover:bg-accent focus:bg-accent"
-                      onSelect={() => setSelectedMode(mode.id)}
-                    >
-                      <div
-                        className={cn(
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
-                          selectedMode === mode.id
-                            ? "bg-primary/10 text-primary"
-                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                        )}
+      {/* 반응형 입력창 컨테이너 - 12-Grid 기반 */}
+      <div className="mb-4 w-full max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-2xl border border-border/70 bg-card/90 p-1.5 sm:p-2 shadow-lg shadow-primary/5 backdrop-blur">
+        <div className="rounded-xl border border-border/60 bg-background/80 px-2 py-1.5">
+          {/* 텍스트 입력 영역 - 반응형 */}
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={onInputChange}
+            onKeyDown={onInputKeyDown}
+            placeholder="오늘 해결하고 싶은 작업을 입력하세요"
+            rows={2}
+            className="max-h-[180px] min-h-[50px] sm:min-h-[60px] w-full resize-none bg-transparent text-xs sm:text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          <div className="mt-1 sm:mt-1.5 flex items-center justify-between border-t border-border/60 pt-1 sm:pt-1.5">
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              {/* 파일 첨부 */}
+              <button className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <Paperclip className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              </button>
+              {/* 커넥터 */}
+              <button className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <Link className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              </button>
+              {/* 모드 선택 */}
+              <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                <DropdownMenu.Trigger asChild>
+                  <button className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none">
+                    <Settings2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="z-50 min-w-[220px] rounded-xl border border-border bg-card p-1.5 shadow-xl"
+                    sideOffset={8}
+                    align="start"
+                  >
+                    {modes.map((mode) => (
+                      <DropdownMenu.Item
+                        key={mode.id}
+                        className="group flex cursor-pointer items-start gap-2.5 rounded-lg px-2.5 py-2 outline-none transition-colors hover:bg-accent focus:bg-accent"
+                        onSelect={() => setSelectedMode(mode.id)}
                       >
-                        <mode.icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-foreground">
-                            {mode.name}
-                          </span>
-                          {selectedMode === mode.id && (
-                            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary">
-                              <svg
-                                className="h-2.5 w-2.5 text-primary-foreground"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={3}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            </div>
+                        <div
+                          className={cn(
+                            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                            selectedMode === mode.id
+                              ? "bg-primary/10 text-primary"
+                              : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                           )}
+                        >
+                          <mode.icon className="h-3.5 w-3.5" />
                         </div>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {mode.description}
-                        </p>
-                      </div>
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
-
-            {/* 텍스트 입력 영역 */}
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={onInputChange}
-              onKeyDown={onInputKeyDown}
-              placeholder="오늘 해결하고 싶은 작업을 입력하세요"
-              rows={3}
-              className="max-h-[240px] min-h-[86px] flex-1 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none"
-            />
-          </div>
-          <div className="mt-2 flex items-center justify-between border-t border-border/60 pt-2">
-            <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <Paperclip className="h-3.5 w-3.5" />
-              파일 첨부
-            </button>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-foreground">
+                              {mode.name}
+                            </span>
+                            {selectedMode === mode.id && (
+                              <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary">
+                                <svg
+                                  className="h-2 w-2 text-primary-foreground"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={3}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-[10px] text-muted-foreground">
+                            {mode.description}
+                          </p>
+                        </div>
+                      </DropdownMenu.Item>
+                    ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            </div>
             <button
               onClick={onSend}
               disabled={!input.trim()}
               className={cn(
-                "flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-medium transition-colors",
+                "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
                 input.trim()
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "bg-muted text-muted-foreground"
               )}
             >
-              시작하기
-              <Send className="h-3.5 w-3.5" />
+              <Send className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
           </div>
         </div>
@@ -281,48 +287,48 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div
       className={cn(
-        "flex w-full gap-3",
+        "flex w-full gap-1.5 sm:gap-2",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       {!isUser && (
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-card">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <div className="flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center rounded-lg border border-border bg-card">
+          <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary" />
         </div>
       )}
       <div
         className={cn(
-          "flex max-w-[75%] flex-col gap-2",
+          "flex max-w-[85%] sm:max-w-[80%] md:max-w-[75%] flex-col gap-1 sm:gap-1.5",
           isUser ? "items-end" : "items-start"
         )}
       >
         <div
           className={cn(
-            "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+            "rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed",
             isUser
               ? "bg-primary text-primary-foreground"
               : "bg-card text-card-foreground border border-border"
           )}
         >
-          <div className="whitespace-pre-wrap">{message.content}</div>
+          <div className="whitespace-pre-wrap break-words">{message.content}</div>
         </div>
         {!isUser && (
-          <div className="flex items-center gap-1 px-1">
-            <button className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <Copy className="h-3 w-3" />
+          <div className="hidden sm:flex items-center gap-0.5 px-1">
+            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <Copy className="h-2.5 w-2.5" />
             </button>
-            <button className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <ThumbsUp className="h-3 w-3" />
+            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <ThumbsUp className="h-2.5 w-2.5" />
             </button>
-            <button className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <ThumbsDown className="h-3 w-3" />
+            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <ThumbsDown className="h-2.5 w-2.5" />
             </button>
-            <button className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <RotateCcw className="h-3 w-3" />
+            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <RotateCcw className="h-2.5 w-2.5" />
             </button>
           </div>
         )}
-        <span className="px-1 text-[11px] text-muted-foreground">
+        <span className="px-1 text-[9px] sm:text-[10px] text-muted-foreground">
           {message.timestamp}
         </span>
       </div>
@@ -380,6 +386,8 @@ export function ChatArea({
   selectedChatId,
   isSplitView,
   onToggleSplit,
+  onOpenSidebar,
+  isMobile = false,
 }: ChatAreaProps) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>(
@@ -457,23 +465,33 @@ export function ChatArea({
 
   const chatContent = (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2">
         <div className="flex items-center gap-2">
+          {/* 모바일 메뉴 버튼 */}
+          {isMobile && onOpenSidebar && (
+            <button
+              onClick={onOpenSidebar}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+              title="메뉴 열기"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          )}
           {selectedChatId && (
-            <h1 className="text-sm font-medium text-foreground">
+            <h1 className="text-xs sm:text-sm font-medium text-foreground truncate">
               {sampleMessages[0]?.content.slice(0, 40)}...
             </h1>
           )}
         </div>
         <button
           onClick={onToggleSplit}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           title={isSplitView ? "패널 닫기" : "패널 열기"}
         >
           {isSplitView ? (
-            <PanelRightClose className="h-4 w-4" />
+            <PanelRightClose className="h-3.5 w-3.5" />
           ) : (
-            <PanelRightOpen className="h-4 w-4" />
+            <PanelRightOpen className="h-3.5 w-3.5" />
           )}
         </button>
       </div>
@@ -494,7 +512,7 @@ export function ChatArea({
         />
       ) : (
         <ScrollArea className="flex-1">
-          <div ref={scrollRef} className="flex flex-col gap-6 px-4 py-6 md:px-8 lg:px-16">
+          <div ref={scrollRef} className="flex flex-col gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-12">
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
@@ -503,78 +521,10 @@ export function ChatArea({
       )}
 
       {messages.length > 0 && (
-        <div className="shrink-0 border-t border-border px-4 pb-4 pt-3 md:px-8 lg:px-16">
-          <div className="mx-auto max-w-3xl">
-            <div className="relative flex items-end gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-ring">
-              {/* 모드 선택 드롭다운 */}
-              <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                <DropdownMenu.Trigger asChild>
-                  <button className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium text-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <currentMode.icon className="h-3.5 w-3.5" />
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="z-50 min-w-[240px] rounded-xl border border-border bg-card p-1.5 shadow-xl"
-                    sideOffset={8}
-                    align="start"
-                  >
-                    {modes.map((mode) => (
-                      <DropdownMenu.Item
-                        key={mode.id}
-                        className="group flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors hover:bg-accent focus:bg-accent"
-                        onSelect={() => setSelectedMode(mode.id)}
-                      >
-                        <div
-                          className={cn(
-                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
-                            selectedMode === mode.id
-                              ? "bg-primary/10 text-primary"
-                              : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                          )}
-                        >
-                          <mode.icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-foreground">
-                              {mode.name}
-                            </span>
-                            {selectedMode === mode.id && (
-                              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary">
-                                <svg
-                                  className="h-2.5 w-2.5 text-primary-foreground"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={3}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                          <p className="mt-0.5 text-xs text-muted-foreground">
-                            {mode.description}
-                          </p>
-                        </div>
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-
-              {/* 파일 첨부 버튼 */}
-              <button className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
-                <Paperclip className="h-4 w-4" />
-              </button>
-
-              {/* 텍스트 입력 */}
+        <div className="shrink-0 border-t border-border px-3 pb-2 pt-1.5 sm:px-4 sm:pb-3 sm:pt-2 md:px-6 lg:px-12">
+          <div className="mx-auto max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
+            <div className="relative rounded-lg sm:rounded-xl border border-border bg-card p-1 sm:p-1.5 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-ring">
+              {/* 텍스트 입력 - 반응형 */}
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -582,24 +532,99 @@ export function ChatArea({
                 onKeyDown={handleKeyDown}
                 placeholder="메시지를 입력하세요..."
                 rows={1}
-                className="max-h-[200px] min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="max-h-[120px] sm:max-h-[160px] min-h-[28px] sm:min-h-[32px] w-full resize-none bg-transparent px-1 py-1 sm:py-1.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
-
-              {/* 전송 버튼 */}
-              <button
-                onClick={handleSend}
-                disabled={!input.trim()}
-                className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center transition-colors",
-                  input.trim()
-                    ? "text-primary hover:text-primary/80"
-                    : "text-muted-foreground/40"
-                )}
-              >
-                <Send className="h-4 w-4" />
-              </button>
+              
+              {/* 하단 버튼 영역 - 반응형 */}
+              <div className="flex items-center justify-between border-t border-border/60 pt-1 sm:pt-1.5 mt-0.5 sm:mt-1">
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  {/* 파일 첨부 */}
+                  <button className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                    <Paperclip className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  </button>
+                  {/* 커넥터 */}
+                  <button className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                    <Link className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  </button>
+                  {/* 모드 선택 */}
+                  <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                    <DropdownMenu.Trigger asChild>
+                      <button className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none">
+                        <Settings2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                      </button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                      <DropdownMenu.Content
+                        className="z-50 min-w-[220px] rounded-xl border border-border bg-card p-1.5 shadow-xl"
+                        sideOffset={8}
+                        align="start"
+                      >
+                        {modes.map((mode) => (
+                          <DropdownMenu.Item
+                            key={mode.id}
+                            className="group flex cursor-pointer items-start gap-2.5 rounded-lg px-2.5 py-2 outline-none transition-colors hover:bg-accent focus:bg-accent"
+                            onSelect={() => setSelectedMode(mode.id)}
+                          >
+                            <div
+                              className={cn(
+                                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                                selectedMode === mode.id
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                              )}
+                            >
+                              <mode.icon className="h-3.5 w-3.5" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-foreground">
+                                  {mode.name}
+                                </span>
+                                {selectedMode === mode.id && (
+                                  <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary">
+                                    <svg
+                                      className="h-2 w-2 text-primary-foreground"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={3}
+                                        d="M5 13l4 4L19 7"
+                                      />
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="mt-0.5 text-[10px] text-muted-foreground">
+                                {mode.description}
+                              </p>
+                            </div>
+                          </DropdownMenu.Item>
+                        ))}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                  </DropdownMenu.Root>
+                </div>
+                
+                {/* 전송 버튼 - 반응형 */}
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className={cn(
+                    "flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                    input.trim()
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  <Send className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                </button>
+              </div>
             </div>
-            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            <p className="mt-1 sm:mt-1.5 text-center text-[9px] sm:text-[10px] text-muted-foreground hidden sm:block">
               Sentinel은 실수할 수 있습니다. 중요한 정보는 직접 확인하세요.
             </p>
           </div>
