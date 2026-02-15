@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   Plus,
-  Search,
   FolderOpen,
   MessageSquare,
   ChevronLeft,
@@ -12,6 +11,9 @@ import {
   Trash2,
   Pencil,
   Hash,
+  Bot,
+  Puzzle,
+  Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SentinelLogo } from "@/components/sentinel-logo";
@@ -77,22 +79,14 @@ export function ChatSidebar({
   onOpenSettings,
   isMobile = false,
 }: ChatSidebarProps) {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredHistory = searchQuery
-    ? chatHistory.filter((chat) =>
-        chat.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : chatHistory;
 
   return (
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
           "flex h-full flex-col border-r border-border bg-sidebar transition-all duration-300 ease-in-out",
-          // 반응형 너비 설정
-          collapsed ? "w-16" : "w-72 lg:w-64 xl:w-72 2xl:w-80",
+          // 반응형 너비 설정 - 더 컴팩트하게 조정
+          collapsed ? "w-16" : "w-60 lg:w-56 xl:w-60 2xl:w-64",
           // 모바일에서는 절대 위치로 오버레이
           isMobile && !collapsed && "fixed left-0 top-0 z-50 h-full shadow-2xl"
         )}
@@ -149,22 +143,35 @@ export function ChatSidebar({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setSearchOpen(!searchOpen)}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-                  >
-                    <Search className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">검색</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
                   <button className="flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
                     <FolderOpen className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">프로젝트</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                    <Bot className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Agent</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                    <Puzzle className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">MCP</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="flex h-9 w-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                    <Lightbulb className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Skills</TooltipContent>
               </Tooltip>
             </>
           ) : (
@@ -176,42 +183,31 @@ export function ChatSidebar({
                 <Plus className="h-4 w-4" />
                 <span>새 대화</span>
               </button>
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-              >
-                <Search className="h-4 w-4" />
-                <span>검색</span>
-              </button>
               <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
                 <FolderOpen className="h-4 w-4" />
                 <span>프로젝트</span>
+              </button>
+              <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                <Bot className="h-4 w-4" />
+                <span>Agent</span>
+              </button>
+              <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                <Puzzle className="h-4 w-4" />
+                <span>MCP</span>
+              </button>
+              <button className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent">
+                <Lightbulb className="h-4 w-4" />
+                <span>Skills</span>
               </button>
             </>
           )}
         </div>
 
-        {searchOpen && !collapsed && (
-          <div className="shrink-0 px-3 py-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="대화 검색..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 w-full rounded-md border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                autoFocus
-              />
-            </div>
-          </div>
-        )}
-
         <ScrollArea className="flex-1">
           <div className={cn("py-2", collapsed ? "px-2" : "px-2")}>
             {collapsed ? (
               <div className="flex flex-col items-center gap-1">
-                {filteredHistory.slice(0, 8).map((chat) => (
+                {chatHistory.slice(0, 8).map((chat) => (
                   <Tooltip key={chat.id}>
                     <TooltipTrigger asChild>
                       <button
@@ -233,7 +229,7 @@ export function ChatSidebar({
             ) : (
               <div className="flex flex-col gap-4">
                 {categories.map((category) => {
-                  const chats = filteredHistory.filter(
+                  const chats = chatHistory.filter(
                     (c) => c.category === category.key
                   );
                   if (chats.length === 0) return null;
