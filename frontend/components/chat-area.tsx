@@ -51,27 +51,75 @@ const sampleMessages: Message[] = [
   {
     id: "m1",
     role: "user",
+    content: "Python으로 간단한 웹 스크래퍼를 만들어줘",
+    timestamp: "오후 2:15",
+  },
+  {
+    id: "m2",
+    role: "assistant",
+    content:
+      "requests와 BeautifulSoup을 사용한 간단한 웹 스크래퍼 예제입니다. 이 코드는 웹페이지의 제목과 링크를 추출합니다.",
+    timestamp: "오후 2:16",
+    codeBlock: {
+      language: "python",
+      filename: "web_scraper.py",
+      code: `import requests
+from bs4 import BeautifulSoup
+
+def scrape_website(url):
+    """웹사이트에서 데이터를 스크래핑하는 함수"""
+    try:
+        # 웹페이지 가져오기
+        response = requests.get(url)
+        response.raise_for_status()
+        
+        # HTML 파싱
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # 제목 추출
+        title = soup.find('title')
+        print(f"페이지 제목: {title.string if title else '없음'}")
+        
+        # 모든 링크 추출
+        links = soup.find_all('a', href=True)
+        print(f"\\n총 {len(links)}개의 링크 발견:\\n")
+        
+        for link in links[:10]:  # 처음 10개만 출력
+            print(f"- {link.get('href')}")
+            
+    except Exception as e:
+        print(f"에러 발생: {e}")
+
+# 사용 예제
+if __name__ == "__main__":
+    scrape_website("https://example.com")`,
+    },
+  },
+  {
+    id: "m3",
+    role: "user",
     content: "React Server Components와 Client Components의 차이점을 설명해주세요.",
     timestamp: "오후 2:30",
   },
   {
-    id: "m2",
+    id: "m4",
     role: "assistant",
     content:
       "React Server Components(RSC)와 Client Components는 렌더링 위치와 기능에서 핵심적인 차이가 있습니다.\n\n**Server Components**는 서버에서만 실행되며, 번들 크기에 영향을 주지 않습니다. 데이터베이스나 파일 시스템에 직접 접근할 수 있고, `async/await`를 자연스럽게 사용할 수 있습니다.\n\n**Client Components**는 브라우저에서 실행되며, `useState`, `useEffect` 같은 React 훅을 사용할 수 있습니다. 사용자 인터랙션을 처리하고, 브라우저 API에 접근할 수 있습니다.",
     timestamp: "오후 2:31",
     codeBlock: {
       language: "tsx",
-      filename: "server-component.tsx",
+      filename: "components.tsx",
       code: `// Server Component (기본값)
 async function ServerComponent() {
   const data = await db.query('SELECT * FROM posts');
+  
   return (
-    <div>
+    <div className="space-y-4">
       {data.map(post => (
-        <article key={post.id}>
-          <h2>{post.title}</h2>
-          <p>{post.content}</p>
+        <article key={post.id} className="p-4 border rounded">
+          <h2 className="text-xl font-bold">{post.title}</h2>
+          <p className="text-gray-600">{post.content}</p>
         </article>
       ))}
     </div>
@@ -84,8 +132,12 @@ import { useState } from 'react';
 
 function ClientComponent() {
   const [count, setCount] = useState(0);
+  
   return (
-    <button onClick={() => setCount(c => c + 1)}>
+    <button 
+      onClick={() => setCount(c => c + 1)}
+      className="px-4 py-2 bg-blue-500 text-white rounded"
+    >
       Clicks: {count}
     </button>
   );
@@ -93,39 +145,259 @@ function ClientComponent() {
     },
   },
   {
-    id: "m3",
+    id: "m5",
     role: "user",
-    content:
-      "Server Components에서 데이터를 가져와서 Client Components에 전달하는 패턴을 보여주세요.",
+    content: "REST API를 만들 때 좋은 구조를 알려줘",
     timestamp: "오후 2:35",
   },
   {
-    id: "m4",
+    id: "m6",
     role: "assistant",
     content:
-      "Server Components에서 Client Components로 데이터를 전달하는 패턴은 매우 직관적입니다. Server Component에서 데이터를 fetch한 후, Client Component의 props로 전달하면 됩니다.",
+      "Express.js로 구조화된 REST API 예제입니다. 컨트롤러 패턴을 사용하여 깔끔한 코드 구조를 유지할 수 있습니다.",
     timestamp: "오후 2:36",
     codeBlock: {
-      language: "tsx",
-      filename: "data-passing-pattern.tsx",
-      code: `// app/posts/page.tsx (Server Component)
-export default async function PostsPage() {
-  const posts = await fetch('https://api.example.com/posts').then(res => res.json());
-  return <PostList initialPosts={posts} />;
+      language: "javascript",
+      filename: "api/users.js",
+      code: `const express = require('express');
+const router = express.Router();
+
+// 데이터베이스 모델 (예시)
+const User = require('../models/User');
+
+// GET /api/users - 모든 사용자 조회
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find()
+      .select('-password')
+      .limit(100);
+    
+    res.json({
+      success: true,
+      count: users.length,
+      data: users
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// GET /api/users/:id - 특정 사용자 조회
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// POST /api/users - 새 사용자 생성
+router.post('/', async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    
+    res.status(201).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+module.exports = router;`,
+    },
+  },
+  {
+    id: "m7",
+    role: "user",
+    content: "TypeScript의 타입 가드 예제를 보여줘",
+    timestamp: "오후 2:40",
+  },
+  {
+    id: "m8",
+    role: "assistant",
+    content:
+      "TypeScript의 타입 가드는 런타임에 타입을 좁혀주는 강력한 기능입니다. 여러 가지 방법을 소개합니다.",
+    timestamp: "오후 2:41",
+    codeBlock: {
+      language: "typescript",
+      filename: "type-guards.ts",
+      code: `// 1. typeof 타입 가드
+function processValue(value: string | number) {
+  if (typeof value === 'string') {
+    return value.toUpperCase(); // string으로 좁혀짐
+  }
+  return value.toFixed(2); // number로 좁혀짐
 }
 
-// app/posts/post-list.tsx (Client Component)
-'use client'
-export function PostList({ initialPosts }) {
-  const [posts, setPosts] = useState(initialPosts);
-  return (
-    <div>
-      {posts.map(post => (
-        <div key={post.id}>{post.title}</div>
-      ))}
-    </div>
-  );
+// 2. instanceof 타입 가드
+class Dog {
+  bark() { console.log('Woof!'); }
+}
+
+class Cat {
+  meow() { console.log('Meow!'); }
+}
+
+function makeSound(animal: Dog | Cat) {
+  if (animal instanceof Dog) {
+    animal.bark(); // Dog로 좁혀짐
+  } else {
+    animal.meow(); // Cat으로 좁혀짐
+  }
+}
+
+// 3. 사용자 정의 타입 가드
+interface Fish {
+  swim: () => void;
+}
+
+interface Bird {
+  fly: () => void;
+}
+
+function isFish(pet: Fish | Bird): pet is Fish {
+  return (pet as Fish).swim !== undefined;
+}
+
+function move(pet: Fish | Bird) {
+  if (isFish(pet)) {
+    pet.swim(); // Fish로 좁혀짐
+  } else {
+    pet.fly(); // Bird로 좁혀짐
+  }
+}
+
+// 4. in 연산자 타입 가드
+type Admin = { name: string; privileges: string[] };
+type User = { name: string; email: string };
+
+function printInfo(person: Admin | User) {
+  console.log(person.name);
+  
+  if ('privileges' in person) {
+    console.log(person.privileges); // Admin으로 좁혀짐
+  }
+  
+  if ('email' in person) {
+    console.log(person.email); // User로 좁혀짐
+  }
 }`,
+    },
+  },
+  {
+    id: "m9",
+    role: "user",
+    content: "Docker Compose 설정 예제 좀 보여줄래?",
+    timestamp: "오후 2:45",
+  },
+  {
+    id: "m10",
+    role: "assistant",
+    content:
+      "Node.js 앱과 PostgreSQL, Redis를 사용하는 Docker Compose 설정 예제입니다. 프로덕션 환경에서 바로 사용할 수 있는 구조입니다.",
+    timestamp: "오후 2:46",
+    codeBlock: {
+      language: "yaml",
+      filename: "docker-compose.yml",
+      code: `version: '3.8'
+
+services:
+  # Node.js 애플리케이션
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@db:5432/myapp
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+    volumes:
+      - ./logs:/app/logs
+
+  # PostgreSQL 데이터베이스
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=myapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Redis 캐시
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    command: redis-server --appendonly yes
+
+  # Nginx 리버스 프록시 (선택사항)
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:`,
     },
   },
 ];
@@ -283,6 +555,15 @@ function EmptyState({
 
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
+  const [codeCopied, setCodeCopied] = useState(false);
+
+  const handleCopyCode = async () => {
+    if (message.codeBlock?.code) {
+      await navigator.clipboard.writeText(message.codeBlock.code);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
 
   return (
     <div
@@ -298,39 +579,104 @@ function MessageBubble({ message }: { message: Message }) {
       )}
       <div
         className={cn(
-          "flex max-w-[85%] sm:max-w-[80%] md:max-w-[75%] flex-col gap-1 sm:gap-1.5",
+          "flex w-full flex-col gap-1.5",
           isUser ? "items-end" : "items-start"
         )}
       >
+        {/* 메시지 컨테이너 */}
         <div
           className={cn(
-            "rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed",
+            "w-full overflow-hidden rounded-lg sm:rounded-xl",
             isUser
-              ? "bg-primary text-primary-foreground"
+              ? "max-w-[85%] sm:max-w-[80%] md:max-w-[75%] bg-primary text-primary-foreground"
               : "bg-card text-card-foreground border border-border"
           )}
         >
-          <div className="whitespace-pre-wrap break-words">{message.content}</div>
+          {/* 텍스트 메시지 */}
+          {message.content && (
+            <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed">
+              <div className="whitespace-pre-wrap break-words">{message.content}</div>
+            </div>
+          )}
+
+          {/* 코드 블록 */}
+          {message.codeBlock && (
+            <div className={cn("overflow-hidden", message.content && "border-t border-border/50")}>
+              {/* 코드 블록 헤더 */}
+              <div className="flex items-center justify-between bg-muted/30 px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
+                  </div>
+                  {message.codeBlock.filename && (
+                    <span className="text-xs font-medium text-foreground">
+                      {message.codeBlock.filename}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {message.codeBlock.language}
+                  </span>
+                  <button
+                    onClick={handleCopyCode}
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    title="코드 복사"
+                  >
+                    {codeCopied ? (
+                      <svg
+                        className="h-3 w-3 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              {/* 코드 내용 */}
+              <ScrollArea className="max-h-[400px]">
+                <pre className="p-3 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/20">
+                  <code className="text-foreground font-mono">{message.codeBlock.code}</code>
+                </pre>
+              </ScrollArea>
+            </div>
+          )}
         </div>
-        {!isUser && (
-          <div className="hidden sm:flex items-center gap-0.5 px-1">
-            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <Copy className="h-2.5 w-2.5" />
-            </button>
-            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <ThumbsUp className="h-2.5 w-2.5" />
-            </button>
-            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <ThumbsDown className="h-2.5 w-2.5" />
-            </button>
-            <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-              <RotateCcw className="h-2.5 w-2.5" />
-            </button>
-          </div>
-        )}
-        <span className="px-1 text-[9px] sm:text-[10px] text-muted-foreground">
-          {message.timestamp}
-        </span>
+
+        {/* 액션 버튼 및 타임스탬프 */}
+        <div className="flex items-center gap-2 px-1">
+          {!isUser && (
+            <div className="hidden sm:flex items-center gap-0.5">
+              <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <Copy className="h-2.5 w-2.5" />
+              </button>
+              <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <ThumbsUp className="h-2.5 w-2.5" />
+              </button>
+              <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <ThumbsDown className="h-2.5 w-2.5" />
+              </button>
+              <button className="flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <RotateCcw className="h-2.5 w-2.5" />
+              </button>
+            </div>
+          )}
+          <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+            {message.timestamp}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -512,10 +858,12 @@ export function ChatArea({
         />
       ) : (
         <ScrollArea className="flex-1">
-          <div ref={scrollRef} className="flex flex-col gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-12">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
+          <div ref={scrollRef} className="px-3 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-12">
+            <div className="mx-auto flex w-full max-w-full flex-col gap-3 sm:max-w-xl sm:gap-4 md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+            </div>
           </div>
         </ScrollArea>
       )}
