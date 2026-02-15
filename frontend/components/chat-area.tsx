@@ -601,53 +601,39 @@ function MessageBubble({ message }: { message: Message }) {
 
           {/* 코드 블록 */}
           {message.codeBlock && (
-            <div className={cn("overflow-hidden", message.content && "border-t border-border/50")}>
+            <div className={cn("overflow-hidden", message.content && "mt-2")}>
               {/* 코드 블록 헤더 */}
-              <div className="flex items-center justify-between bg-muted/30 px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                  </div>
-                  {message.codeBlock.filename && (
-                    <span className="text-xs font-medium text-foreground">
-                      {message.codeBlock.filename}
-                    </span>
+              <div className="flex items-center justify-between bg-muted/40 px-3 py-1.5">
+                <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  {message.codeBlock.language}
+                </span>
+                <button
+                  onClick={handleCopyCode}
+                  className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+                  title="코드 복사"
+                >
+                  {codeCopied ? (
+                    <svg
+                      className="h-3.5 w-3.5 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
                   )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    {message.codeBlock.language}
-                  </span>
-                  <button
-                    onClick={handleCopyCode}
-                    className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    title="코드 복사"
-                  >
-                    {codeCopied ? (
-                      <svg
-                        className="h-3 w-3 text-green-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    ) : (
-                      <Copy className="h-3 w-3" />
-                    )}
-                  </button>
-                </div>
+                </button>
               </div>
               {/* 코드 내용 */}
               <ScrollArea className="max-h-[400px]">
-                <pre className="p-3 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/20">
+                <pre className="px-3 py-2.5 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/10">
                   <code className="text-foreground font-mono">{message.codeBlock.code}</code>
                 </pre>
               </ScrollArea>
