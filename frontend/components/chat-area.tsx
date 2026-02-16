@@ -571,7 +571,7 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div
       className={cn(
-        "flex w-full gap-1.5 sm:gap-2",
+        "flex w-full gap-1.5 sm:gap-2 min-w-0",
         isUser ? "justify-end" : "justify-start"
       )}
     >
@@ -582,26 +582,27 @@ function MessageBubble({ message }: { message: Message }) {
       )}
       <div
         className={cn(
-          "flex flex-col gap-1.5",
-          isUser ? "items-end w-fit max-w-[85%] sm:max-w-[80%] md:max-w-[75%]" : "items-start w-full"
+          "flex flex-col gap-1.5 min-w-0 overflow-hidden",
+          isUser ? "items-end max-w-[85%] sm:max-w-[80%] md:max-w-[75%]" : "items-start flex-1"
         )}
       >
         {/* 메시지 컨테이너 */}
         <div
           className={cn(
-            "overflow-hidden rounded-lg sm:rounded-xl",
-            isUser
-              ? "w-fit bg-primary text-primary-foreground"
-              : "w-full bg-card text-card-foreground border border-border"
+            "overflow-hidden min-w-0",
+            isUser ? "w-auto bg-primary text-primary-foreground rounded-lg sm:rounded-xl" : "w-full"
           )}
         >
           {messageParts.map((part, index) => (
-            <div key={index}>
+            <div key={index} className="min-w-0 w-full overflow-hidden">
               {part.type === 'text' ? (
                 // 텍스트 부분
                 part.content.trim() && (
-                  <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed">
-                    <div className="whitespace-pre-wrap break-words">{part.content.trim()}</div>
+                  <div className={cn(
+                    "text-xs sm:text-sm leading-relaxed break-words",
+                    isUser ? "px-2.5 py-1.5 sm:px-3 sm:py-2" : "py-0.5"
+                  )}>
+                    <div className="whitespace-pre-wrap break-words overflow-wrap-anywhere">{part.content.trim()}</div>
                   </div>
                 )
               ) : (
@@ -653,20 +654,20 @@ function CodeBlock({ language, code, isFirst }: { language: string; code: string
   };
 
   return (
-    <div className={cn("overflow-hidden", !isFirst && "border-t border-border/50")}>
+    <div className={cn("w-full overflow-hidden rounded-lg sm:rounded-xl border border-border", !isFirst && "mt-2")}>
       {/* 코드 블록 헤더 */}
-      <div className="flex items-center justify-between bg-muted/40 px-3 py-1.5">
-        <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+      <div className="flex items-center justify-between bg-muted/40 px-2 sm:px-3 py-1.5 shrink-0">
+        <span className="rounded bg-muted px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-muted-foreground">
           {language}
         </span>
         <button
           onClick={handleCopy}
-          className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+          className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground shrink-0"
           title="코드 복사"
         >
           {copied ? (
             <svg
-              className="h-3.5 w-3.5 text-green-500"
+              className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-green-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -679,14 +680,14 @@ function CodeBlock({ language, code, isFirst }: { language: string; code: string
               />
             </svg>
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           )}
         </button>
       </div>
       {/* 코드 내용 */}
-      <ScrollArea className="max-h-[400px]">
-        <pre className="px-3 py-2.5 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/10">
-          <code className="text-foreground font-mono">{code}</code>
+      <ScrollArea className="max-h-[300px] sm:max-h-[400px] w-full">
+        <pre className="px-2 sm:px-3 py-2 sm:py-2.5 text-[11px] sm:text-xs leading-relaxed overflow-x-auto bg-muted/10 w-full">
+          <code className="text-foreground font-mono break-all">{code}</code>
         </pre>
       </ScrollArea>
     </div>
@@ -869,8 +870,8 @@ export function ChatArea({
         />
       ) : (
         <ScrollArea className="flex-1">
-          <div ref={scrollRef} className="px-3 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-12">
-            <div className="mx-auto flex w-full max-w-full flex-col gap-3 sm:max-w-xl sm:gap-4 md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
+          <div ref={scrollRef} className="px-2 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-12">
+            <div className="mx-auto flex w-full max-w-full flex-col gap-3 sm:max-w-xl sm:gap-4 md:max-w-2xl lg:max-w-3xl xl:max-w-4xl overflow-hidden">
               {messages.map((message) => (
                 <MessageBubble key={message.id} message={message} />
               ))}
@@ -880,7 +881,7 @@ export function ChatArea({
       )}
 
       {messages.length > 0 && (
-        <div className="shrink-0 border-t border-border px-3 pb-2 pt-1.5 sm:px-4 sm:pb-3 sm:pt-2 md:px-6 lg:px-12">
+        <div className="shrink-0 border-t border-border px-2 pb-2 pt-1.5 sm:px-4 sm:pb-3 sm:pt-2 md:px-6 lg:px-12">
           <div className="mx-auto max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
             <div className="relative rounded-lg sm:rounded-xl border border-border bg-card p-1 sm:p-1.5 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-1 focus-within:ring-ring">
               {/* 텍스트 입력 - 반응형 */}
