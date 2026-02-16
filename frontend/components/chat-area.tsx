@@ -32,11 +32,6 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
-  codeBlock?: {
-    language: string;
-    code: string;
-    filename?: string;
-  };
 }
 
 interface ChatAreaProps {
@@ -57,13 +52,10 @@ const sampleMessages: Message[] = [
   {
     id: "m2",
     role: "assistant",
-    content:
-      "requests와 BeautifulSoup을 사용한 간단한 웹 스크래퍼 예제입니다. 이 코드는 웹페이지의 제목과 링크를 추출합니다.",
-    timestamp: "오후 2:16",
-    codeBlock: {
-      language: "python",
-      filename: "web_scraper.py",
-      code: `import requests
+    content: `requests와 BeautifulSoup을 사용한 간단한 웹 스크래퍼 예제입니다. 이 코드는 웹페이지의 제목과 링크를 추출합니다.
+
+\`\`\`python
+import requests
 from bs4 import BeautifulSoup
 
 def scrape_website(url):
@@ -92,8 +84,9 @@ def scrape_website(url):
 
 # 사용 예제
 if __name__ == "__main__":
-    scrape_website("https://example.com")`,
-    },
+    scrape_website("https://example.com")
+\`\`\``,
+    timestamp: "오후 2:16",
   },
   {
     id: "m3",
@@ -104,13 +97,14 @@ if __name__ == "__main__":
   {
     id: "m4",
     role: "assistant",
-    content:
-      "React Server Components(RSC)와 Client Components는 렌더링 위치와 기능에서 핵심적인 차이가 있습니다.\n\n**Server Components**는 서버에서만 실행되며, 번들 크기에 영향을 주지 않습니다. 데이터베이스나 파일 시스템에 직접 접근할 수 있고, `async/await`를 자연스럽게 사용할 수 있습니다.\n\n**Client Components**는 브라우저에서 실행되며, `useState`, `useEffect` 같은 React 훅을 사용할 수 있습니다. 사용자 인터랙션을 처리하고, 브라우저 API에 접근할 수 있습니다.",
-    timestamp: "오후 2:31",
-    codeBlock: {
-      language: "tsx",
-      filename: "components.tsx",
-      code: `// Server Component (기본값)
+    content: `React Server Components(RSC)와 Client Components는 렌더링 위치와 기능에서 핵심적인 차이가 있습니다.
+
+**Server Components**는 서버에서만 실행되며, 번들 크기에 영향을 주지 않습니다. 데이터베이스나 파일 시스템에 직접 접근할 수 있고, \`async/await\`를 자연스럽게 사용할 수 있습니다.
+
+**Client Components**는 브라우저에서 실행되며, \`useState\`, \`useEffect\` 같은 React 훅을 사용할 수 있습니다. 사용자 인터랙션을 처리하고, 브라우저 API에 접근할 수 있습니다.
+
+\`\`\`tsx
+// Server Component (기본값)
 async function ServerComponent() {
   const data = await db.query('SELECT * FROM posts');
   
@@ -141,8 +135,9 @@ function ClientComponent() {
       Clicks: {count}
     </button>
   );
-}`,
-    },
+}
+\`\`\``,
+    timestamp: "오후 2:31",
   },
   {
     id: "m5",
@@ -153,13 +148,10 @@ function ClientComponent() {
   {
     id: "m6",
     role: "assistant",
-    content:
-      "Express.js로 구조화된 REST API 예제입니다. 컨트롤러 패턴을 사용하여 깔끔한 코드 구조를 유지할 수 있습니다.",
-    timestamp: "오후 2:36",
-    codeBlock: {
-      language: "javascript",
-      filename: "api/users.js",
-      code: `const express = require('express');
+    content: `Express.js로 구조화된 REST API 예제입니다. 컨트롤러 패턴을 사용하여 깔끔한 코드 구조를 유지할 수 있습니다.
+
+\`\`\`javascript
+const express = require('express');
 const router = express.Router();
 
 // 데이터베이스 모델 (예시)
@@ -226,8 +218,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;`,
-    },
+module.exports = router;
+\`\`\``,
+    timestamp: "오후 2:36",
   },
   {
     id: "m7",
@@ -238,13 +231,10 @@ module.exports = router;`,
   {
     id: "m8",
     role: "assistant",
-    content:
-      "TypeScript의 타입 가드는 런타임에 타입을 좁혀주는 강력한 기능입니다. 여러 가지 방법을 소개합니다.",
-    timestamp: "오후 2:41",
-    codeBlock: {
-      language: "typescript",
-      filename: "type-guards.ts",
-      code: `// 1. typeof 타입 가드
+    content: `TypeScript의 타입 가드는 런타임에 타입을 좁혀주는 강력한 기능입니다. 여러 가지 방법을 소개합니다.
+
+\`\`\`typescript
+// 1. typeof 타입 가드
 function processValue(value: string | number) {
   if (typeof value === 'string') {
     return value.toUpperCase(); // string으로 좁혀짐
@@ -304,8 +294,9 @@ function printInfo(person: Admin | User) {
   if ('email' in person) {
     console.log(person.email); // User로 좁혀짐
   }
-}`,
-    },
+}
+\`\`\``,
+    timestamp: "오후 2:41",
   },
   {
     id: "m9",
@@ -316,13 +307,10 @@ function printInfo(person: Admin | User) {
   {
     id: "m10",
     role: "assistant",
-    content:
-      "Node.js 앱과 PostgreSQL, Redis를 사용하는 Docker Compose 설정 예제입니다. 프로덕션 환경에서 바로 사용할 수 있는 구조입니다.",
-    timestamp: "오후 2:46",
-    codeBlock: {
-      language: "yaml",
-      filename: "docker-compose.yml",
-      code: `version: '3.8'
+    content: `Node.js 앱과 PostgreSQL, Redis를 사용하는 Docker Compose 설정 예제입니다. 프로덕션 환경에서 바로 사용할 수 있는 구조입니다.
+
+\`\`\`yaml
+version: '3.8'
 
 services:
   # Node.js 애플리케이션
@@ -375,30 +363,15 @@ services:
       - app-network
     command: redis-server --appendonly yes
 
-  # Nginx 리버스 프록시 (선택사항)
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - app
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
 
 volumes:
   postgres-data:
-  redis-data:`,
-    },
+  redis-data:
+\`\`\``,
+    timestamp: "오후 2:46",
   },
 ];
 
@@ -555,15 +528,45 @@ function EmptyState({
 
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
-  const [codeCopied, setCodeCopied] = useState(false);
 
-  const handleCopyCode = async () => {
-    if (message.codeBlock?.code) {
-      await navigator.clipboard.writeText(message.codeBlock.code);
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
+  // 마크다운 코드 블록 파싱
+  const parseCodeBlocks = (content: string) => {
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts: Array<{ type: 'text' | 'code'; content: string; language?: string }> = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      // 코드 블록 이전의 텍스트
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: content.slice(lastIndex, match.index),
+        });
+      }
+
+      // 코드 블록
+      parts.push({
+        type: 'code',
+        language: match[1] || 'text',
+        content: match[2].trim(),
+      });
+
+      lastIndex = match.index + match[0].length;
     }
+
+    // 남은 텍스트
+    if (lastIndex < content.length) {
+      parts.push({
+        type: 'text',
+        content: content.slice(lastIndex),
+      });
+    }
+
+    return parts.length > 0 ? parts : [{ type: 'text' as const, content }];
   };
+
+  const messageParts = parseCodeBlocks(message.content);
 
   return (
     <div
@@ -579,66 +582,38 @@ function MessageBubble({ message }: { message: Message }) {
       )}
       <div
         className={cn(
-          "flex w-full flex-col gap-1.5",
-          isUser ? "items-end" : "items-start"
+          "flex flex-col gap-1.5",
+          isUser ? "items-end w-fit max-w-[85%] sm:max-w-[80%] md:max-w-[75%]" : "items-start w-full"
         )}
       >
         {/* 메시지 컨테이너 */}
         <div
           className={cn(
-            "w-full overflow-hidden rounded-lg sm:rounded-xl",
+            "overflow-hidden rounded-lg sm:rounded-xl",
             isUser
-              ? "max-w-[85%] sm:max-w-[80%] md:max-w-[75%] bg-primary text-primary-foreground"
-              : "bg-card text-card-foreground border border-border"
+              ? "w-fit bg-primary text-primary-foreground"
+              : "w-full bg-card text-card-foreground border border-border"
           )}
         >
-          {/* 텍스트 메시지 */}
-          {message.content && (
-            <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed">
-              <div className="whitespace-pre-wrap break-words">{message.content}</div>
+          {messageParts.map((part, index) => (
+            <div key={index}>
+              {part.type === 'text' ? (
+                // 텍스트 부분
+                part.content.trim() && (
+                  <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm leading-relaxed">
+                    <div className="whitespace-pre-wrap break-words">{part.content.trim()}</div>
+                  </div>
+                )
+              ) : (
+                // 코드 블록
+                <CodeBlock
+                  language={part.language || 'text'}
+                  code={part.content}
+                  isFirst={index === 0}
+                />
+              )}
             </div>
-          )}
-
-          {/* 코드 블록 */}
-          {message.codeBlock && (
-            <div className={cn("overflow-hidden", message.content && "mt-2")}>
-              {/* 코드 블록 헤더 */}
-              <div className="flex items-center justify-between bg-muted/40 px-3 py-1.5">
-                <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  {message.codeBlock.language}
-                </span>
-                <button
-                  onClick={handleCopyCode}
-                  className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-                  title="코드 복사"
-                >
-                  {codeCopied ? (
-                    <svg
-                      className="h-3.5 w-3.5 text-green-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
-                </button>
-              </div>
-              {/* 코드 내용 */}
-              <ScrollArea className="max-h-[400px]">
-                <pre className="px-3 py-2.5 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/10">
-                  <code className="text-foreground font-mono">{message.codeBlock.code}</code>
-                </pre>
-              </ScrollArea>
-            </div>
-          )}
+          ))}
         </div>
 
         {/* 액션 버튼 및 타임스탬프 */}
@@ -664,6 +639,56 @@ function MessageBubble({ message }: { message: Message }) {
           </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CodeBlock({ language, code, isFirst }: { language: string; code: string; isFirst: boolean }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className={cn("overflow-hidden", !isFirst && "border-t border-border/50")}>
+      {/* 코드 블록 헤더 */}
+      <div className="flex items-center justify-between bg-muted/40 px-3 py-1.5">
+        <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {language}
+        </span>
+        <button
+          onClick={handleCopy}
+          className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+          title="코드 복사"
+        >
+          {copied ? (
+            <svg
+              className="h-3.5 w-3.5 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
+        </button>
+      </div>
+      {/* 코드 내용 */}
+      <ScrollArea className="max-h-[400px]">
+        <pre className="px-3 py-2.5 text-xs sm:text-sm leading-relaxed overflow-x-auto bg-muted/10">
+          <code className="text-foreground font-mono">{code}</code>
+        </pre>
+      </ScrollArea>
     </div>
   );
 }
